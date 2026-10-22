@@ -18,6 +18,8 @@ import {
   X,
 } from "lucide-react";
 
+import Login from "./Login";
+
 const sampleTasks = [
   {
     id: 101,
@@ -50,9 +52,10 @@ const sampleTasks = [
 
 const todayString = () => {
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-    d.getDate()
-  ).padStart(2, "0")}`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
 function loadTasks() {
@@ -64,7 +67,6 @@ function loadTasks() {
   }
 }
 
-// Task form is outside App so it is not recreated on every keystroke.
 function TaskForm({
   modal = false,
   title,
@@ -162,6 +164,8 @@ function TaskForm({
 }
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const [tasks, setTasks] = useState(loadTasks);
   const [view, setView] = useState("all");
   const [search, setSearch] = useState("");
@@ -197,7 +201,9 @@ export default function App() {
         .filter((t) => {
           if (view === "pending" && t.done) return false;
           if (view === "completed" && !t.done) return false;
-          if (view === "today" && (t.due !== today || t.done)) return false;
+          if (view === "today" && (t.due !== today || t.done)) {
+            return false;
+          }
 
           const query = `${t.title} ${t.subject} ${t.notes}`.toLowerCase();
 
@@ -286,6 +292,11 @@ export default function App() {
     today,
     addTask,
   };
+
+  // Display login before the dashboard.
+  if (!isLoggedIn) {
+    return <Login onLogin={() => setIsLoggedIn(true)} />;
+  }
 
   return (
     <div className="app-layout">
